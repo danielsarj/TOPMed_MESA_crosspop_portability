@@ -12,14 +12,14 @@ parser$add_argument('--tissue', help='tissue/cell type whose files will be analy
 parser$add_argument('--pop', help='population whose files will be analyzed')
 args <- parser$parse_args()
 
-out_prefix<- '/home/daniel/mashr/matrixeQTL/WGS_files/baseline_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_matrixeQTL_baseline'
+out_prefix<- '/home/daniel/mashr/final_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_matrixeQTL_baseline'
 sigSNPs <- fread('top_' %&% args$tissue %&% '_sigSNPs_shared_genes-new.txt.gz')
-#sigSNPs_g <- fread('top_' %&% args$tissue %&% '_sigSNPs_shared_genes_table.txt.gz')
+h2estimates <- fread('/home/daniel/MESA_heritability/plots/significant_h2estimates_noconstrained_r0.2.txt') %>% filter(h2-2*se > 0.01, tissue==args$tissue) %>% select(gene) %>% unique()
 
 ### reads matrixeQTL output file
 #reading input
 matrixeqtl_in <- fread('cis_eQTLs_' %&% args$tissue %&% '_' %&% args$pop %&% '_PCs_10_WG_noDup.wSE_cis_PAGEintersect-new.txt.gz', stringsAsFactors=F) %>% 
-  right_join(sigSNPs) %>% arrange(gene)
+  right_join(sigSNPs) %>% arrange(gene) %>% filter(gene %in% h2estimates$gene) 
 
 ### making final files
 #weights table

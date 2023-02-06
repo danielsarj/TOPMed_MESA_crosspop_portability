@@ -12,15 +12,15 @@ parser$add_argument('--tissue', help='tissue/cell type whose files will be analy
 parser$add_argument('--pop', help='population whose files will be analyzed')
 args <- parser$parse_args()
 
-out_prefix<- '/home/daniel/mashr/mashr_db/WGS_files/mashr_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_mashr_baseline'
-#sigSNPs <- fread('top_' %&% args$tissue %&% '_mashr_sigSNPs_shared_genes.txt.gz')
+h2estimates <- fread('/home/daniel/MESA_heritability/plots/significant_h2estimates_noconstrained_r0.2.txt') %>% filter(h2-2*se > 0.01, tissue==args$tissue) %>% select(gene) %>% unique()
+
+out_prefix<- '/home/daniel/mashr/final_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_mashr_baseline'
 SNPs_anno <- fread('/home/daniel/mashr/matrixeQTL/WGS_files/snp_annotation/MetaPop.' %&% args$tissue %&% '.WG_noDup_locations.txt.gz')
-#sigSNPs_g <- fread('top_' %&% tissue %&% '_mashr_allSNPs_shared_genes_table.txt.gz')
 
 ### reads mashr output file
 #reading input
 mashr_in <- fread('/home/daniel/mashr/mashr_db/WGS_files/top_' %&% args$tissue %&% '_mashr_sigSNPs-betas_shared_genes.txt.gz', stringsAsFactors=F) %>% 
-  select(gene, snps, varID, contains(args$pop)) %>% rename(beta=contains(args$pop)) %>%
+  filter(gene %in% h2estimates$gene) %>% select(gene, snps, varID, contains(args$pop)) %>% rename(beta=contains(args$pop)) %>%
   left_join(SNPs_anno) %>% arrange(gene)
 
 ### making final files

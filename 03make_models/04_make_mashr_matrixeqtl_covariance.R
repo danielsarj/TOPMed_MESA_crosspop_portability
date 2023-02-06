@@ -1,3 +1,5 @@
+# same script for both MASHR and MatrixeQTL models
+
 library(data.table)
 library(tidyverse)
 library(reshape2)
@@ -87,6 +89,9 @@ gene_annot <- get_gene_annotation(gene_annot_file, args$chr)
 genes_in_chr <- gene_annot %>% pull(gene_id)
 genes <- fread('/home/daniel/mashr/mashr_db/WGS_files/mashr_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_mashr_baseline_summaries.txt.gz', fill=T) %>% pull(gene)
 genes <- intersect(genes, genes_in_chr)
+
+h2estimates <- fread('/home/daniel/MESA_heritability/plots/significant_h2estimates_noconstrained_r0.2.txt') %>% filter(h2-2*se > 0.01, tissue==args$tissue) %>% select(gene) %>% unique()
+genes <- intersect(genes, h2estimates$gene)
 
 for (i in 1:length(genes)){
   working_gene <- genes[i]
