@@ -5,25 +5,27 @@ suppressMessages(library(readr))
 suppressMessages(library(argparse))
 "%&%" <- function(a,b) paste(a,b, sep='')
 driver <- dbDriver('SQLite')
-setwd('/home/daniel/mashr/matrixeQTL/WGS_files/output')
+setwd('/home/daniel/mashr/mashr_dfs/WGS_files/outputs')
 
 parser <- ArgumentParser()
 parser$add_argument('--tissue', help='tissue/cell type whose files will be analyzed')
 parser$add_argument('--pop', help='population whose files will be analyzed')
 args <- parser$parse_args()
 
-out_prefix<- '/home/daniel/mashr/matrixeQTL/WGS_files/baseline_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_matrixeQTL_baseline'
-sigSNPs <- fread('top_' %&% args$tissue %&% '_sigSNPs_shared_genes-new.txt.gz')
-#sigSNPs_g <- fread('top_' %&% args$tissue %&% '_sigSNPs_shared_genes_table.txt.gz')
+h2estimates <- fread('/home/daniel/MESA_heritability/plots/significant_h2estimates_noconstrained_r0.2.txt') %>% filter(h2-2*se > 0.01, tissue==args$tissue) %>% select(gene) %>% unique()
 
-### reads matrixeQTL output file
+out_prefix<- '/home/daniel/mashr/final_models/' %&% args$tissue %&% '_' %&% args$pop %&% '_mashr_baseline'
+SNPs_anno <- fread('/home/daniel/mashr/matrixeQTL/WGS_files/snp_annotation/MetaPop.' %&% args$tissue %&% '.WG_noDup_locations.txt.gz')
+
+### reads mashr output file
 #reading input
-matrixeqtl_in <- fread('cis_eQTLs_' %&% args$tissue %&% '_' %&% args$pop %&% '_PCs_10_WG_noDup.wSE_cis_PAGEintersect-new.txt.gz', stringsAsFactors=F) %>% 
-  right_join(sigSNPs) %>% arrange(gene)
+mashr_in <- fread('/home/daniel/mashr/mashr_db/WGS_files/top_' %&% args$tissue %&% '_mashr_sigSNPs-betas_shared_genes.txt.gz', stringsAsFactors=F) %>% 
+  filter(gene %in% h2estimates$gene) %>% select(gene, snps, varID, contains(args$pop)) %>% rename(beta=contains(args$pop)) %>%
+  left_join(SNPs_anno) %>% arrange(gene)
 
 ### making final files
 #weights table
-weights <- matrixeqtl_in %>% select('gene','snps','varID','refAllele','effectAllele','beta') %>% unique() %>% drop_na()
+weights <- mashr_in %>% select('gene','snps','varID','refAllele','effectAllele','beta') %>% unique() %>% na_if(0) %>% drop_na()
 weights <- rename(weights, 
                   gene=gene,
                   rsid=snps,
@@ -31,11 +33,11 @@ weights <- rename(weights,
                   ref_allele=refAllele, 
                   eff_allele=effectAllele,
                   weight=beta)
+genes_list <- weights %>% pull(gene) %>% unique()
 genes_table <- table(weights$gene) %>% as.data.frame() %>% rename(gene=Var1, n_snps=Freq)
 
 #extra table
-model_summaries <- select(read.table('/home/daniel/gencode_annotation/gene_annotation_v38_60649.txt', header=T, stringsAsFactors=F), c('gene_id','gene_name')) %>% 
-  unique() %>% right_join(genes_table, by=c('gene_id'='gene'))
+model_summaries <- select(read.table('/home/daniel/gencode_annotation/gene_annotation_v38_60649.txt', header=T, stringsAsFactors=F), c('gene_id','gene_name')) %>% unique() %>% filter(gene_id %in% genes_list) %>% inner_join(genes_table, by=c('gene_id'='gene'))
 model_summaries$rho_avg_squared <- rep(NA, nrow(model_summaries))
 model_summaries$zscore_pval <- rep(NA, nrow(model_summaries))
 model_summaries$zscore_qval <- rep(NA, nrow(model_summaries))
