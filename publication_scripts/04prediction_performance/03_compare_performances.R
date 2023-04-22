@@ -9,12 +9,12 @@ setwd('/home/daniel/Geuvadis/WGS_predixcan')
 h2estimates <- fread('/home/daniel/MESA_heritability/plots/significant_h2estimates_noconstrained_r0.2.txt') %>% filter(h2-2*se > 0.01)
 
 # reading geuvadis outputs
-for (tis in c('PBMC','Mono','Tcell')){
+for (tis in c('PBMC')){
   for (m_pop in c('AFA','EUR','HIS','CHN')){
     if (tis!='PBMC' & m_pop=='CHN'){
       next
     } else {
-      for (method in c('ENunf', 'mashr', 'matrixeqtl')){
+      for (method in c('ENunf', 'mashr', 'matrixeqtl', 'TIGAR_1e-04', 'JTI')){
         for (g_pop in c('GBR', 'YRI', 'ALL', 'CEU', 'FIN', 'TSI')){
           
           g_output <- fread('Geuvadis.'%&% g_pop %&%'_'%&% tis %&%'.'%&% m_pop %&%'_'%&% method %&%'_expression_spearman_correlation.txt') %>% 
@@ -45,6 +45,7 @@ geuvadis.median.spearmans.df <- geuvadis.spearmans.df.filtered %>% group_by(tiss
 geuvadis.median.spearmans.df$model <- gsub('ENunf', 'EN', geuvadis.median.spearmans.df$model)
 geuvadis.median.spearmans.df$model <- gsub('mashr', 'MASHR', geuvadis.median.spearmans.df$model)
 geuvadis.median.spearmans.df$model <- gsub('matrixeqtl', 'MatrixeQTL', geuvadis.median.spearmans.df$model)
+geuvadis.median.spearmans.df$model <- gsub('TIGAR_1e-04', 'TIGAR', geuvadis.median.spearmans.df$model)
 fwrite(geuvadis.median.spearmans.df, 'Geuvadis_median_spearman_heatmap_filteredbyh2.txt', col.names=T, sep='\t', quote=F)
 
 # making heatmap
@@ -130,6 +131,8 @@ gbr.yri.spermans.df <- geuvadis.spearmans.df.filtered %>% filter(geu_pop=='GBR' 
 gbr.yri.spermans.df$model <- gsub('ENunf', 'EN', gbr.yri.spermans.df$model)
 gbr.yri.spermans.df$model <- gsub('mashr', 'MASHR', gbr.yri.spermans.df$model)
 gbr.yri.spermans.df$model <- gsub('matrixeqtl', 'MatrixeQTL', gbr.yri.spermans.df$model)
+gbr.yri.spermans.df$model <- gsub('TIGAR_1e-04', 'TIGAR', gbr.yri.spermans.df$model)
+
 
 # violin plots per tissue
 for (tis in unique(gbr.yri.spermans.df$tissue)){
@@ -189,6 +192,8 @@ for (tis in unique(gbr.yri.spermans.df$tissue)){
         en.genes <- gbr.yri.spermans.df %>% filter(tissue==tis, model=='EN', geu_pop==p, mesa_pop==m)
         mashr.genes <- gbr.yri.spermans.df %>% filter(tissue==tis, model=='MASHR', geu_pop==p, mesa_pop==m)
         matrixeqtl.genes <- gbr.yri.spermans.df %>% filter(tissue==tis, model=='MatrixeQTL', geu_pop==p, mesa_pop==m)
+        tigar.genes <- gbr.yri.spermans.df %>% filter(tissue==tis, model=='TIGAR', geu_pop==p, mesa_pop==m)
+        jti.genes <- gbr.yri.spermans.df %>% filter(tissue==tis, model=='JTI', geu_pop==p, mesa_pop==m)
         
         en.mashr.shared.genes <- intersect(en.genes$gene_id, mashr.genes$gene_id) 
         en.mashr.joint.df <- rbind(en.genes, mashr.genes) %>% filter(gene_id %in% en.mashr.shared.genes)
@@ -196,8 +201,37 @@ for (tis in unique(gbr.yri.spermans.df$tissue)){
         en.matrixeqtl.shared.genes <- intersect(en.genes$gene_id, matrixeqtl.genes$gene_id) 
         en.matrixeqtl.joint.df <- rbind(en.genes, matrixeqtl.genes) %>% filter(gene_id %in% en.matrixeqtl.shared.genes)
         
+        en.tigar.shared.genes <- intersect(en.genes$gene_id, tigar.genes$gene_id) 
+        en.tigar.joint.df <- rbind(en.genes, tigar.genes) %>% filter(gene_id %in% en.tigar.shared.genes)
+        
         mashr.matrixeqtl.shared.genes <- intersect(mashr.genes$gene_id, matrixeqtl.genes$gene_id) 
         mashr.matrixeqtl.joint.df <- rbind(mashr.genes, matrixeqtl.genes) %>% filter(gene_id %in% mashr.matrixeqtl.shared.genes)
+        
+        en.jti.shared.genes <- intersect(en.genes$gene_id, jti.genes$gene_id) 
+        en.jti.joint.df <- rbind(en.genes, jti.genes) %>% filter(gene_id %in% en.jti.shared.genes)
+        
+        mashr.jti.shared.genes <- intersect(mashr.genes$gene_id, jti.genes$gene_id) 
+        mashr.jti.joint.df <- rbind(mashr.genes, jti.genes) %>% filter(gene_id %in% mashr.jti.shared.genes)
+        
+        mashr.tigar.shared.genes <- intersect(mashr.genes$gene_id, tigar.genes$gene_id) 
+        mashr.tigar.joint.df <- rbind(mashr.genes, tigar.genes) %>% filter(gene_id %in% mashr.tigar.shared.genes)
+        
+        matrixeqtl.tigar.shared.genes <- intersect(matrixeqtl.genes$gene_id, tigar.genes$gene_id) 
+        matrixeqtl.tigar.joint.df <- rbind(matrixeqtl.genes, tigar.genes) %>% filter(gene_id %in% matrixeqtl.tigar.shared.genes)
+        
+        en.mashr.tigar.shared.genes <- intersect(mashr.genes$gene_id, tigar.genes$gene_id) %>% intersect(en.genes$gene_id) 
+        en.mashr.tigar.joint.df <- rbind(en.genes, mashr.genes, tigar.genes) %>% filter(gene_id %in% en.mashr.tigar.shared.genes)
+        
+        en.mashr.jti.shared.genes <- intersect(mashr.genes$gene_id, jti.genes$gene_id) %>% intersect(en.genes$gene_id) 
+        en.mashr.jti.joint.df <- rbind(en.genes, mashr.genes, jti.genes) %>% filter(gene_id %in% en.mashr.jti.shared.genes)
+        
+        if (exists('shared.genes.en.mashr.jti')){
+          shared.genes.en.mashr.jti <- rbind(shared.genes.en.mashr.jti, en.mashr.jti.joint.df)
+        } else {shared.genes.en.mashr.jti <- en.mashr.jti.joint.df}
+        
+        if (exists('shared.genes.en.mashr.tigar')){
+          shared.genes.en.mashr.tigar <- rbind(shared.genes.en.mashr.tigar, en.mashr.tigar.joint.df)
+        } else {shared.genes.en.mashr.tigar <- en.mashr.tigar.joint.df}
         
         if (exists('shared.genes.en.mashr')){
           shared.genes.en.mashr <- rbind(shared.genes.en.mashr, en.mashr.joint.df)
@@ -210,6 +244,27 @@ for (tis in unique(gbr.yri.spermans.df$tissue)){
         if (exists('shared.genes.mashr.matrixeqtl')){
           shared.genes.mashr.matrixeqtl <- rbind(shared.genes.mashr.matrixeqtl, mashr.matrixeqtl.joint.df)
         } else {shared.genes.mashr.matrixeqtl <- mashr.matrixeqtl.joint.df}
+        
+        if (exists('shared.genes.mashr.tigar')){
+          shared.genes.mashr.tigar <- rbind(shared.genes.mashr.tigar, mashr.tigar.joint.df)
+        } else {shared.genes.mashr.tigar <- mashr.tigar.joint.df}
+        
+        if (exists('shared.genes.en.tigar')){
+          shared.genes.en.tigar <- rbind(shared.genes.en.tigar, en.tigar.joint.df)
+        } else {shared.genes.en.tigar <- en.tigar.joint.df}
+        
+        if (exists('shared.genes.matrixeqtl.tigar')){
+          shared.genes.matrixeqtl.tigar <- rbind(shared.genes.matrixeqtl.tigar, matrixeqtl.tigar.joint.df)
+        } else {shared.genes.matrixeqtl.tigar <- matrixeqtl.tigar.joint.df}
+        
+        if (exists('shared.genes.en.jti')){
+          shared.genes.en.jti <- rbind(shared.genes.en.jti, en.jti.joint.df)
+        } else {shared.genes.en.jti <- en.jti.joint.df}
+        
+        if (exists('shared.genes.mashr.jti')){
+          shared.genes.mashr.jti <- rbind(shared.genes.mashr.jti, mashr.jti.joint.df)
+        } else {shared.genes.mashr.jti <- mashr.jti.joint.df}
+        
       }
     }
   }
@@ -260,3 +315,49 @@ for (tis in unique(gbr.yri.spermans.df$tissue)){
   rm(shared.genes.en.matrixeqtl)
   rm(shared.genes.mashr.matrixeqtl)
 }
+
+
+
+# shared genes and EN and TIGAR
+shared.genes.en.tigar %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.1, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + stat_compare_means(method='wilcox.test', label='p.signif')
+
+# shared genes and MASHR and TIGAR
+shared.genes.mashr.tigar %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.1, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + stat_compare_means(method='wilcox.test', label='p.signif')
+
+# shared genes and EN and JTI
+shared.genes.en.jti %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.4, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + stat_compare_means(method='wilcox.test', label='p.signif')
+
+# shared genes and MASHR and JTI
+shared.genes.mashr.jti %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.4, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + stat_compare_means(method='wilcox.test', label='p.signif')
+
+# shared genes and MASHR and TIGAR and EN
+shared.genes.en.mashr.tigar %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.4, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + 
+  stat_compare_means(method='wilcox.test', label='p.signif')
+
+# shared genes and MASHR and JTI and EN
+shared.genes.en.mashr.jti %>% ggplot(., aes(x=geu_pop, y=estimate, fill=model)) + geom_violin() + facet_wrap(~mesa_pop) +
+  geom_boxplot(width=0.4, position=position_dodge(0.9)) + scale_fill_viridis(discrete=T, alpha=0.5) +
+  labs(title='Spearman correlation in Geuvadis ('%&% tis %&%')', fill='Model') + ylab('Spearman correlation') + xlab('Geuvadis populations') + 
+  stat_compare_means(method='wilcox.test', label='p.signif')
+for (p in c('GBR', 'YRI')){
+  for (m in c('AFA','EUR','HIS','CHN')){
+    print(p %&% ' ' %&% m)
+    shared.genes.en.mashr.jti %>% filter(geu_pop==p, mesa_pop==m) %>% compare_means(estimate~model, ., method = "wilcox.test") %>% print()
+    shared.genes.en.mashr.jti %>% filter(geu_pop==p, mesa_pop==m) %>% select(gene_id) %>% unique %>% nrow() %>% print()
+  }
+}
+  
+    
+    
+    
+
