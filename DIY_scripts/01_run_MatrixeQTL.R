@@ -1,7 +1,7 @@
 # script based on Ryan Schubert's scripts, which can be found in here:
 # https://github.com/RyanSchu/TOPMed_Proteome/tree/main/04pQTL
 
-# loading libraries and defining arguments
+# Loading libraries and defining arguments
 suppressMessages(library(argparse))
 suppressMessages(library(MatrixEQTL))
 suppressMessages(library(data.table))
