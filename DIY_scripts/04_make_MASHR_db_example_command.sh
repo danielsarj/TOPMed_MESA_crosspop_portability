@@ -1,6 +1,7 @@
 #!/bin/bash
 
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/03_run_MASHR.R \
--i ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_inputs \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_outputs
+Rscript ~/github_mashr_project/DIY_scripts/04_make_MASHR_db.R \
+-f ~/github_mashr_project/sample_data/MASHR_outputs \
+-c GBR-YRI \
+-g ~/github_mashr_project/sample_data/gene_annotation.txt \
+-o ~/github_mashr_project/sample_data/MASHR_models
