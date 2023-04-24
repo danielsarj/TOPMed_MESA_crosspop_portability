@@ -47,11 +47,13 @@ for (working_gene in gene_list){
     # Get posterior summaries
     posterior_lfsr <- get_lfsr(m) # local false sign rate
     posterior_lfsr <- cbind(df_anno, posterior_lfsr)
+    colnames(posterior_lfsr) <- gsub('_beta', '_lfsr', colnames(posterior_lfsr))
     posterior_mean <- get_pm(m) # new betas
     posterior_mean <- cbind(df_anno, posterior_mean)
     posterior_sd <- get_psd(m) # standard deviantion
     posterior_sd <- cbind(df_anno, posterior_sd)
-  
+    colnames(posterior_sd) <- gsub('_beta', '_SD', colnames(posterior_sd))
+
     # Write output
     fwrite(posterior_lfsr, file=args$output %&% '/' %&% working_gene %&% '_MASHR_lfsr.txt', quote=F, sep=' ')
     fwrite(posterior_mean, file=args$output %&% '/' %&% working_gene %&% '_MASHR_beta.txt', quote=F, sep=' ')
