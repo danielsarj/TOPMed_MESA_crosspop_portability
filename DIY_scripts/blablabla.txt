@@ -1,1 +1,0 @@
-folder in which scripts to make your own pop-adjusted MASHR models will be
