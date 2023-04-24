@@ -1,6 +1,6 @@
 # Loading libraries and defining arguments
 suppressMessages(library(data.table))
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
 suppressMessages(library(argparse))
 suppressMessages(library(mashr))
 '%&%' = function(a,b) paste (a,b,sep='')
