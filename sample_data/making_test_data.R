@@ -21,6 +21,10 @@ colnames(dosage)[1:7] <- c('chr', 'snp_ID', 'pos', 'ref_allele', 'alt_allele', '
 dosage$chr <- 22
 dosage <- dosage %>% filter(pos >= min_dosage_start, pos <= max_dosage_end, maf_gbr > 0 | maf_yri > 0)
 
+dosage_unique_snps <- dosage %>% select(pos) 
+dosage_unique_snps <- dosage_unique_snps[!(duplicated(dosage_unique_snps) | duplicated(dosage_unique_snps, fromLast=T)),] # removes multiallelic snps 
+dosage <- left_join(dosage_unique_snps, dosage)
+
 dosage_gbr_raw <- dosage %>% dplyr::select(chr, snp_ID, pos, ref_allele, alt_allele, all_of(samples_gbr))
 fwrite(dosage_gbr_raw, '/home/daniel/github_mashr_project/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_unfiltered.txt', col.names=T, quote=F, sep=' ')
 
