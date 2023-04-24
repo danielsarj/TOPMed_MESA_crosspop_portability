@@ -3,7 +3,7 @@
 
 # Loading libraries and defining arguments and functions
 suppressMessages(library(data.table))
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
 suppressMessages(library(reshape2))
 suppressMessages(library(argparse))
 "%&%" <- function(a,b) paste(a,b, sep = "")

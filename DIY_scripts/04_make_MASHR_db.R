@@ -1,8 +1,8 @@
 # Loading libraries and defining arguments
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+suppressMessages(library(stringr))
 suppressMessages(library(RSQLite))
 suppressMessages(library(data.table))
-suppressMessages(library(readr))
 suppressMessages(library(argparse))
 "%&%" <- function(a,b) paste(a,b, sep='')
 driver <- dbDriver('SQLite')

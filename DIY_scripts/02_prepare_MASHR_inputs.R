@@ -1,6 +1,7 @@
 # Loading libraries and defining arguments
 suppressMessages(library(data.table))
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+suppressMessages(library(tidyr))
 suppressMessages(library(argparse))
 '%&%' = function(a,b) paste (a,b,sep='')
 parser <- ArgumentParser()

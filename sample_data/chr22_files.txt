@@ -1,2 +1,2 @@
-GBR /home/daniel/github_mashr_project/sample_data/cis_ES/GBR_chr22_cis.txt /home/daniel/github_mashr_project/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz
-YRI /home/daniel/github_mashr_project/sample_data/cis_ES/YRI_chr22_cis.txt /home/daniel/github_mashr_project/sample_data/dosages/GEUVADIS_YRI_chr22_dosage_filtered.txt.gz
+GBR ~/TOPMed_MESA_crosspop_portability/sample_data/cis_ES/GBR_chr22_cis.txt ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz
+YRI ~/TOPMed_MESA_crosspop_portability/sample_data/cis_ES/YRI_chr22_cis.txt ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_YRI_chr22_dosage_filtered.txt.gz
