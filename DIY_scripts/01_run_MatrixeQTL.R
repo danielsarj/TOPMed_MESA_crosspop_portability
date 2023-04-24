@@ -12,7 +12,7 @@ parser$add_argument('-d', '--snpdosage', help='file path of the snp dosage file'
 parser$add_argument('-e', '--geneexpression', help='file path of the gene expression file')
 parser$add_argument('-g', '--geneannotation', help='file path of the gene annotation file')
 parser$add_argument('-t', '--tag', help='file tag for this run of samples')
-parser$add_argument('-o', '--outputdir', help='file tag for this run of samples', type='character', default='./')
+parser$add_argument('-o', '--outputdir', help='output directory path', type='character', default='./')
 parser$add_argument('-w','--window', help='maximum distance between snps to be considered cis', type='double', default=1e6)
 args <- parser$parse_args()
 

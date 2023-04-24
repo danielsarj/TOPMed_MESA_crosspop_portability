@@ -6,6 +6,7 @@ suppressMessages(library(argparse))
 parser <- ArgumentParser()
 parser$add_argument('-l', '--listinputs', help='path to file containing inputs to be read for each condition')
 parser$add_argument('-g', '--geneannotation', help='file path of the gene annotation file')
+parser$add_argument('-c', '--chromosome', help='chromosome number to be analyzed')
 parser$add_argument('-o', '--output', help='path of the output directory')
 args <- parser$parse_args()
 
@@ -30,7 +31,7 @@ for (i in 1:nrow(files_to_analyze)){
 rm(cis_es, dosage) # free memory
 
 # Get list of genes
-gene_list <- fread(args$geneannotation) %>% pull(gene_id) %>% unique()  
+gene_list <- fread(args$geneannotation) %>% filter(chr==args$chromosome) %>% pull(gene_id) %>% unique()  
 
 # Take a gene from the list, gets betas and SEs for all pops, and writes the output files
 for (working_gene in gene_list){
