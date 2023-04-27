@@ -54,7 +54,7 @@ The first step is to estimate cis-eQTL effect sizes individually for each condit
 * `-w`, `--window`: Size of the cis-SNP window from the TSS and TES. By default, it is `1e6`. 
 
 ### Input files:
-1. SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's alt_allele dosage (ref_allele is coded as 0, alt_allele is coded as 1). We highly recommend removing ambiguous and multi-allelic SNPs. It is okay if a dosage file for one population contains SNPs missing in other populations. Each population should have its own dosage file.
+1. SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's alt_allele dosage (ref_allele is coded as 0, alt_allele is coded as 1). We highly recommend removing ambiguous strand and multi-allelic SNPs. It is okay if a dosage file for one population contains SNPs missing in other populations. Each population should have its own dosage file.
 
 chr | snp_ID | pos | ref_allele | alt_allele | Sample1
 --- | --- | --- | --- | --- | ---
@@ -257,7 +257,7 @@ The fifth step consists of making the SNP-SNP covariance files required to run T
 * `-w`, `--window`: Size of the cis-SNP window from the TSS and TES. By default, it is `1e6`. 
 
 ### Input files:
-1. Unfiltered SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's dosage concerning the SNP. We highly recommend removing ambiguous and multi-allelic SNPs. This file should contain all SNPs before any QC filtering, such as MAF as HWE. Each population should have its own dosage file.
+1. Unfiltered SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's alt_allele dosage (ref_allele is coded as 0, alt_allele is coded as 1). We highly recommend removing ambiguous strand and multi-allelic SNPs.  This file should contain all SNPs before any QC filtering, such as MAF as HWE. Each population should have its own dosage file.
 
 chr | snp_ID | pos | ref_allele | alt_allele | Sample1
 --- | --- | --- | --- | --- | ---
