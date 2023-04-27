@@ -10,8 +10,8 @@ parser$add_argument('-g', '--geneannotation', help='file path of the gene annota
 parser$add_argument('-o', '--output', help='path of the output directory')
 args <- parser$parse_args()
 
-# Change working directory to where input files are 
-setwd(args$input)
+# working directory to where input files are 
+mashr_dir = args$input
 
 # Get list of genes
 gene_list <- fread(args$geneannotation) %>% pull(gene_id) %>% unique()  
@@ -21,12 +21,12 @@ for (working_gene in gene_list){
   print('INFO: Running MASHR with gene ' %&% working_gene)
   
   # Load beta and SE dfs as matrices
-  beta <- fread(working_gene %&% '_beta.txt.gz', header=T, stringsAsFactors=F) %>% select(contains('beta')) %>% as.matrix()
-  se <- fread(working_gene %&% '_SE.txt.gz', header=T, stringsAsFactors=F) %>% select(contains('SE')) %>% as.matrix() %>% abs() 
+  beta <- fread(mashr_dir %&% '/' %&% working_gene %&% '_beta.txt.gz', header=T, stringsAsFactors=F) %>% select(contains('beta')) %>% as.matrix()
+  se <- fread(mashr_dir %&% '/' %&% working_gene %&% '_SE.txt.gz', header=T, stringsAsFactors=F) %>% select(contains('SE')) %>% as.matrix() %>% abs() 
     #use abs() as recommended by mashr:
     #'Both Bhat and Shat are zero (or near zero) for some input data. Please check your input. 
     #If it is expected please set Shat to a positive number to avoid numerical issues;'
-  df_anno <- fread(working_gene %&% '_beta.txt.gz', header=T, stringsAsFactors=F) %>% select(gene, snps, snp_ID)
+  df_anno <- fread(mashr_dir %&% '/' %&% working_gene %&% '_beta.txt.gz', header=T, stringsAsFactors=F) %>% select(gene, snps, snp_ID)
   
   if (nrow(df_anno)==1){
     print('INFO: Not enough SNPs in the input data frame to run MASHR for ' %&% working_gene %&%'. Skipping gene')
