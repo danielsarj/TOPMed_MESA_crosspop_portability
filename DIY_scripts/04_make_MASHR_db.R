@@ -13,20 +13,20 @@ parser$add_argument('-c', '--codes', help='conditions code used, separated by a 
 parser$add_argument('-o', '--outpath', help='population whose files will be analyzed')
 args <- parser$parse_args()
 
-# Change working directory to where input files are 
-setwd(args$filesdirectory)
+# working directory to where mashr results files are 
+mashr_dir = args$filesdirectory
 
 # Get conditions codes
 codes <- args$codes %>% str_split(pattern='-') %>% unlist()
 
 # Get gene names in the MASHR output files directory
-gene_list <- list.files('.') %>% substr(1,15) %>% unique()
+gene_list <- list.files(mashr_dir %&% '/') %>% substr(1,15) %>% unique()
 
 # Figure out what is the most significant SNP per gene, per pop
 print('INFO: Assessing top SNPs per conditions for each gene')
 for (working_gene in gene_list){
   # Read data frame containing LFSRs
-  lfsr <- fread(working_gene %&% '_MASHR_lfsr.txt.gz', header=T)
+  lfsr <- fread(mashr_dir %&% "/" %&% working_gene %&% '_MASHR_lfsr.txt.gz', header=T)
   
   # Initialize empty list
   lfsr_dfs <- list()
@@ -57,7 +57,7 @@ for (c in codes){
   
   # Get betas for each gene
   for (working_gene in gene_list){
-    mashr_in <- fread(working_gene %&% '_MASHR_beta.txt.gz') %>% select(gene, snps, snp_ID, contains(c)) %>% 
+    mashr_in <- fread(mashr_dir %&% "/" %&% working_gene %&% '_MASHR_beta.txt.gz') %>% select(gene, snps, snp_ID, contains(c)) %>% 
       inner_join(top_SNPs_df, by=c('gene', 'snps', 'snp_ID'))
     if (exists('weights_df')){
       weights_df <- rbind(weights_df, mashr_in)
