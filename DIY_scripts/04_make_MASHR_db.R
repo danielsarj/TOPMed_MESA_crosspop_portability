@@ -10,7 +10,7 @@ parser <- ArgumentParser()
 parser$add_argument('-f', '--filesdirectory', help='path of the directory with files containing MASHR outputs')
 parser$add_argument('-g', '--geneannotation', help='file path of the gene annotation file')
 parser$add_argument('-c', '--codes', help='conditions code used, separated by a hyphen ("-")')
-parser$add_argument('-o', '--outpath', help='population whose files will be analyzed')
+parser$add_argument('-o', '--outpath', help='output directory path')
 args <- parser$parse_args()
 
 # working directory to where mashr results files are 
