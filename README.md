@@ -10,6 +10,7 @@ For more information about model design and performance, please refer to the res
 
 * [Do-it-yourself](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#do-it-yourself)
   * [Pipeline requirements](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#pipeline-requirements)
+  * [Step 0. Clone the repo and move into it](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#clone-the-repo-and-move-into-it)
   * [Step 1. Estimate unadjusted cis-eQTL effect sizes](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#step-1-estimate-unadjusted-cis-eqtl-effect-sizes)
   * [Step 2. Prepare MASHR inputs](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#step-2-prepare-mashr-inputs)
   * [Step 3. Run MASHR](https://github.com/danielsarj/TOPMed_MESA_crosspop_portability#step-3-run-mashr)
@@ -35,6 +36,17 @@ The pipeline is built on R and requires the following R packages:
 * [RSQLite](https://cran.r-project.org/web/packages/RSQLite/index.html)
 * [stringr](https://cran.r-project.org/web/packages/stringr/index.html)
 * [tidyr](https://cran.r-project.org/web/packages/tidyr/index.html)
+
+___
+
+### Step 0. Clone the repo and move into it
+
+Before atempting to run our pipeline, you should clone the repo and then move into it.
+
+`git clone https://github.com/danielsarj/TOPMed_MESA_crosspop_portability.git`
+
+`cd TOPMed_MESA_crosspop_portability`
+
 ___
 
 ### Step 1. Estimate unadjusted cis-eQTL effect sizes
@@ -49,7 +61,7 @@ The first step is to estimate cis-eQTL effect sizes individually for each condit
 * `-w`, `--window`: Size of the cis-SNP window from the TSS and TES. By default, it is `1e6`. 
 
 ### Input files:
-1. SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's dosage concerning the SNP. We highly recommend removing ambiguous and multi-allelic SNPs. It is okay if a dosage file for one population contains SNPs missing in other populations. Each population should have its own dosage file.
+1. SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's alt_allele dosage (ref_allele is coded as 0, alt_allele is coded as 1). We highly recommend removing ambiguous strand and multi-allelic SNPs. It is okay if a dosage file for one population contains SNPs missing in other populations. Each population should have its own dosage file.
 
 chr | snp_ID | pos | ref_allele | alt_allele | Sample1
 --- | --- | --- | --- | --- | ---
@@ -73,12 +85,12 @@ chr | gene_id | gene_name | start | end | gene_type
 #### Example command
 
 ```
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/01_run_MatrixeQTL.R \
--d ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz \
--e ~/TOPMed_MESA_crosspop_portability/sample_data/exp_tbls/GEUVADIS_GBR_expression.txt.gz \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
+Rscript DIY_scripts/01_run_MatrixeQTL.R \
+-d sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz \
+-e sample_data/exp_tbls/GEUVADIS_GBR_expression.txt.gz \
+-g sample_data/gene_annotation.txt \
 -t GBR_chr22_cis \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/cis_ES/ \
+-o sample_data/cis_ES/ \
 -w 1000000
 ```
 
@@ -88,8 +100,8 @@ The first step will produce output files (one per population/chromosome) that ar
 
 snps | gene | statistic | pvalue | FDR | beta | SE
 --- | --- | --- | --- | --- | --- | ---
-chr22:26379178 | ENSG00000261188 | 4.17859262847936 | 7.14867054260006e-05 | 0.493258267439404 | 1.85382924858658 | 0.443649193259887
-chr22:26358282 | ENSG00000261188 | 3.56862236345645 | 0.00059619153356162 | 0.703727948206992 | 0.373151478008807 | 0.104564574226169
+chr22:26379178 | ENSG00000261188 | 4.17859 | 7.14867e-05 | 0.49326 | 1.85383 | 0.44365
+chr22:26358282 | ENSG00000261188 | 3.56862 | 0.00060 | 0.70373 | 0.37315 | 0.10456
 
 ___
 
@@ -105,9 +117,9 @@ The second step consists of preparing the input files required to run MASHR. For
 ### Input files:
 1. List of inputs: it is a space- or tab-separated file, containing 3 columns and no header. For each row, provide the condition code, the path to the first step's output, and the path to the dosage file (the same used for step 1). 
 
-GBR | ~/TOPMed_MESA_crosspop_portability/sample_data/cis_ES/GBR_chr22_cis.txt | ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz
+GBR | sample_data/cis_ES/GBR_chr22_cis.txt | sample_data/dosages/GEUVADIS_GBR_chr22_dosage_filtered.txt.gz
 --- | --- | ---
-YRI | ~/TOPMed_MESA_crosspop_portability/sample_data/cis_ES/YRI_chr22_cis.txt | ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_YRI_chr22_dosage_filtered.txt.gz
+YRI | sample_data/cis_ES/YRI_chr22_cis.txt | sample_data/dosages/GEUVADIS_YRI_chr22_dosage_filtered.txt.gz
 
 2. Gene annotation file: it is a space- or tab-separated file containing 6 columns. Each row is a different gene and contains information about their ID, name, TSS, TES, and type. 
 
@@ -119,11 +131,11 @@ chr | gene_id | gene_name | start | end | gene_type
 #### Example command
 
 ```
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/02_prepare_MASHR_inputs.R \
--l ~/TOPMed_MESA_crosspop_portability/sample_data/chr22_files.txt \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
+Rscript DIY_scripts/02_prepare_MASHR_inputs.R \
+-l sample_data/chr22_files.txt \
+-g sample_data/gene_annotation.txt \
 -c 22 \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_inputs
+-o sample_data/MASHR_inputs
 ```
 
 ### Output files:
@@ -132,15 +144,15 @@ The second step will produce output files (two per gene in the dataset) that are
 
 snps | snp_ID | gene | GBR_beta | YRI_beta
 --- | --- | --- | --- | ---
-chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | -0.000942147025196598 | 0.00481675332681294
-chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0 | 0.290500545943225
+chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | -0.00094 | 0.00482
+chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0 | 0.29050
 
 Output files ending in `_SE.txt` contain, as the name suggests, the standard errors for each SNP-gene pair for each population. Standard errors equal to 10 mean that the SNP in the respective row is missing from the population's dosage file.
 
 snps | snp_ID | gene | GBR_SE | YRI_SE
 --- | --- | --- | --- | ---
-chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | -0.121966506680216 | 0.178397616871198
-chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 10 | 0.389835210194495
+chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | -0.12197 | 0.17840
+chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 10 | 0.38984
 
 ___
 
@@ -163,10 +175,10 @@ chr | gene_id | gene_name | start | end | gene_type
 #### Example command
 
 ```
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/03_run_MASHR.R \
--i ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_inputs \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_outputs
+Rscript DIY_scripts/03_run_MASHR.R \
+-i sample_data/MASHR_inputs \
+-g sample_data/gene_annotation.txt \
+-o sample_data/MASHR_outputs
 ```
 
 ### Output files:
@@ -175,22 +187,22 @@ The third step will produce output files (three per gene in the dataset) that ar
 
 snps | snp_ID | gene | GBR_beta | YRI_beta
 --- | --- | --- | --- | ---
-chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 1.83290685636514e-05 | 7.41946765078412e-05
-chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.000765449390867857 | 0.00459603564276789
+chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 1.83291e-05 | 7.41947e-05
+chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.00077 | 0.00460
 
 Output files ending in `_MASHR_SD.txt` contain, as the name suggests, the standard deviations for each SNP-gene pair for each population. 
 
 snps | snp_ID | gene | GBR_SD | YRI_SD
 --- | --- | --- | --- | ---
-chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 0.00900736394846143 | 0.0235644643803819
-chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.0141805513785063 | 0.0557317748086211
+chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 0.00901 | 0.02356
+chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.01418 | 0.05573
 
 Output files ending in `_MASHR_lfsr.txt` contain, as the name suggests, the local false sign rates for each SNP-gene pair for each population. Local false sign rates measure the confidence in the sign of each effect rather than confidence in each effect being non-zero [[ref](https://doi.org/10.1093/biostatistics/kxw041)]. 
 
 snps | snp_ID | gene | GBR_lfsr | YRI_lfsr
 --- | --- | --- | --- | ---
-chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 0.982997249517182 | 0.980835958151674
-chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.97180709286982 | 0.963355769953236
+chr22:26329350 | chr22:26329350:T:C | ENSG00000100104 | 0.98300 | 0.98084
+chr22:26329511 | chr22:26329511:A:C | ENSG00000100104 | 0.97181 | 0.96336
 
 ___
 
@@ -214,11 +226,11 @@ chr | gene_id | gene_name | start | end | gene_type
 #### Example command
 
 ```
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/04_make_MASHR_db.R \
--f ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_outputs \
+Rscript DIY_scripts/04_make_MASHR_db.R \
+-f sample_data/MASHR_outputs \
 -c GBR-YRI \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_models
+-g sample_data/gene_annotation.txt \
+-o sample_data/MASHR_models
 ```
 
 ### Output files:
@@ -227,8 +239,8 @@ The fourth step will produce output files (three per population). Two of them ar
 
 gene | rsid | varID | ref_allele | eff_allele | weight
 --- | --- | --- | --- | --- | ---
-ENSG00000100099 | chr22:26400509 | chr22:26400509:A:G | A | G | 0.157689114274992
-ENSG00000100104 | chr22:26393189 | chr22:26393189:A:G | A | G | 0.0263773669384809
+ENSG00000100099 | chr22:26400509 | chr22:26400509:A:G | A | G | 0.15769
+ENSG00000100104 | chr22:26393189 | chr22:26393189:A:G | A | G | 0.02638
 
 Output files ending in `_MASHR_summaries.txt` contain, as the name suggests, the summaries of each gene in the MASHR models. The format follows the one required by MetaXcan tools. The last three columns are empty, as we did not implement a cross-validation step in our pipeline. This does not interfere with the usability of the models in MetaXcan. 
 
@@ -252,7 +264,7 @@ The fifth step consists of making the SNP-SNP covariance files required to run T
 * `-w`, `--window`: Size of the cis-SNP window from the TSS and TES. By default, it is `1e6`. 
 
 ### Input files:
-1. Unfiltered SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's dosage concerning the SNP. We highly recommend removing ambiguous and multi-allelic SNPs. This file should contain all SNPs before any QC filtering, such as MAF as HWE. Each population should have its own dosage file.
+1. Unfiltered SNP dosage file: it is a space- or tab-separated file, containing 5+N columns, in which N is the number of individuals in the dataset. Each row is a different SNP, and from the 6th column forward, the columns contain each sample's alt_allele dosage (ref_allele is coded as 0, alt_allele is coded as 1). We highly recommend removing ambiguous strand and multi-allelic SNPs. This file should contain all SNPs before any QC filtering, such as MAF as HWE. Each population should have its own dosage file.
 
 chr | snp_ID | pos | ref_allele | alt_allele | Sample1
 --- | --- | --- | --- | --- | ---
@@ -270,19 +282,19 @@ chr | gene_id | gene_name | start | end | gene_type
 
 gene | rsid | varID | ref_allele | eff_allele | weight
 --- | --- | --- | --- | --- | ---
-ENSG00000100099 | chr22:26400509 | chr22:26400509:A:G | A | G | 0.157689114274992
-ENSG00000100104 | chr22:26393189 | chr22:26393189:A:G | A | G | 0.0263773669384809
+ENSG00000100099 | chr22:26400509 | chr22:26400509:A:G | A | G | 0.15769
+ENSG00000100104 | chr22:26393189 | chr22:26393189:A:G | A | G | 0.02638
 
 #### Example command
 
 ```
-Rscript ~/TOPMed_MESA_crosspop_portability/DIY_scripts/05_make_MASHR_covariances.R \
--d ~/TOPMed_MESA_crosspop_portability/sample_data/dosages/GEUVADIS_GBR_chr22_dosage_unfiltered.txt.gz \
--g ~/TOPMed_MESA_crosspop_portability/sample_data/gene_annotation.txt \
+Rscript DIY_scripts/05_make_MASHR_covariances.R \
+-d sample_data/dosages/GEUVADIS_GBR_chr22_dosage_unfiltered.txt.gz \
+-g sample_data/gene_annotation.txt \
 -t GBR_MASHR \
 -c 22 \
--m ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_models/GBR_MASHR_weights.txt.gz \
--o ~/TOPMed_MESA_crosspop_portability/sample_data/MASHR_models \
+-m sample_data/MASHR_models/GBR_MASHR_weights.txt.gz \
+-o sample_data/MASHR_models \
 -w 1000000
 ```
 
@@ -292,5 +304,5 @@ The fifth step will produce a single output file per run. It is a space-separate
 
 GENE | RSID1 | RSID2|  VALUE
 --- | --- | --- | ---
-ENSG00000128203 | chr22:26369201 | chr22:26369201 | 0.461833105335157
-ENSG00000100099 | chr22:26400509 | chr22:26400509 | 0.238030095759234
+ENSG00000128203 | chr22:26369201 | chr22:26369201 | 0.46183
+ENSG00000100099 | chr22:26400509 | chr22:26400509 | 0.23803
