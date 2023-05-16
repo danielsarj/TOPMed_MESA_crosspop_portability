@@ -1,4 +1,4 @@
-# same script for both MASHR and MatrixeQTL models
+# same script for both JTI, MASHR, MatrixeQTL and TIGAR methods
 
 library(data.table)
 library(tidyverse)

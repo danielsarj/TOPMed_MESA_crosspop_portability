@@ -4,6 +4,7 @@ library(UpSetR)
 library(viridis)
 library(ggpubr)
 library(janitor)
+library(ggplotify)
 '%&%' = function(a,b) paste (a,b,sep='')
 setwd('/home/daniel/SPrediXcan/WGS_SPredixcan')
 
@@ -11,29 +12,17 @@ page_phenos <- c('Height','QRS_duration','C-reactive_protein','BMI','Chronic_kid
 
 # reading PAGE S-PrediXcan outputs
 for (tis in c('PBMC','Mono','Tcell')){
-  for (pop in c('AFA','EUR','HIS','CHN','ALL')){
+  for (pop in c('AFA','EUR','HIS','CHN')){
     if (tis!='PBMC' & pop=='CHN'){
       next
     } else {
-      if (pop=='ALL'){
-        for (m in c('elasticnet_unfiltered')){
-          for (pheno in page_phenos){
-            spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
+      for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered', 'TIGAR', 'JTI')){
+        for (pheno in page_phenos){
+          spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
           
-            if (exists('compiled_page_spredixcan')){
-              compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
-            } else {compiled_page_spredixcan <- spredixcan_output}
-          }
-        }
-      } else {
-        for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered')){
-          for (pheno in page_phenos){
-            spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            
-            if (exists('compiled_page_spredixcan')){
-              compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
-            } else {compiled_page_spredixcan <- spredixcan_output}
-          }
+          if (exists('compiled_page_spredixcan')){
+            compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
+          } else {compiled_page_spredixcan <- spredixcan_output}
         }
       }
     }
@@ -44,37 +33,21 @@ panukbb_phenos <- c('BMI_calcuated','BMI_estimated','Coffee','C-reactive_protein
 
 # reading PanUKBB S-PrediXcan outputs
 for (tis in c('PBMC','Mono','Tcell')){
-  for (pop in c('AFA','EUR','HIS','CHN','ALL')){
+  for (pop in c('AFA','EUR','HIS','CHN')){
     if (tis!='PBMC' & pop=='CHN'){
       next
     } else {
-      if (pop=='ALL'){
-        for (m in c('elasticnet_unfiltered')){
-          for (pheno in panukbb_phenos){
-            if (pheno=='WBCHQ'){
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            } else{
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            }
+      for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered', 'TIGAR', 'JTI')){
+        for (pheno in panukbb_phenos){
+          if (pheno=='WBCHQ'){
+            spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
+          } else{
+            spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
+          }
           
-            if (exists('compiled_panukbb_spredixcan')){
-              compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
-            } else {compiled_panukbb_spredixcan <- spredixcan_output}
-          }
-        }
-      } else {
-        for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered')){
-          for (pheno in panukbb_phenos){
-            if (pheno=='WBCHQ'){
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            } else{
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            }
-            
-            if (exists('compiled_panukbb_spredixcan')){
-              compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
-            } else {compiled_panukbb_spredixcan <- spredixcan_output}
-          }
+          if (exists('compiled_panukbb_spredixcan')){
+            compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
+          } else {compiled_panukbb_spredixcan <- spredixcan_output}
         }
       }
     }
@@ -132,7 +105,7 @@ joint_df <- inner_join(reduced_page, reduced_panukbb, by=c('gene', 'gene_name', 
 joint_df$model <- gsub('mashr', 'MASHR', joint_df$model)
 joint_df$model <- gsub('matrixeQTL', 'MatrixeQTL', joint_df$model)
 joint_df$model <- gsub('elasticnet_unfiltered', 'EN', joint_df$model)
-fwrite(joint_df, 'PAGE_PanUKBB_significant_results.txt', col.names=T, quote=F, sep='\t')
+#fwrite(joint_df, 'PAGE_PanUKBB_significant_results.txt', col.names=T, quote=F, sep='\t')
 
 # filter based on same direction of effect
 joint_df <- joint_df %>% filter((page_effectsize > 0 & panukbb_effectsize > 0) | (page_effectsize < 0 & panukbb_effectsize < 0))
@@ -149,26 +122,35 @@ summ$model <- gsub('elasticnet_unfiltered', 'EN', summ$model)
 
 summ %>% filter(tissue=='PBMC') %>% ggplot(., aes(x=phenotype, y=n, fill=model)) + geom_col(position='dodge') + 
   coord_flip() +  scale_fill_viridis_d(name='Model') + facet_wrap(~population) + xlab('Phenotypes') + ylab('Number of significant genes')
-ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.png', height=6, width=8)
-ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.pdf', height=6, width=8)
-ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.tiff', height=6, width=8)
+#ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.png', height=6, width=8)
+#ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.pdf', height=6, width=8)
+#ggsave('PAGE_PanUKBB_PBMC_colgraph_filth2_sig_samedirection.tiff', height=6, width=8)
 
 summ %>% ggplot(., aes(x=phenotype, y=n, fill=model)) + geom_col(position='dodge') + 
   coord_flip() +  scale_fill_viridis_d(name='Model') + facet_wrap(~population) + xlab('Phenotypes') + ylab('Number of significant genes')
-ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.png', height=6, width=8)
-ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.pdf', height=6, width=8)
-ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.tiff', height=6, width=8)
+#ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.png', height=6, width=8)
+#ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.pdf', height=6, width=8)
+#ggsave('PAGE_PanUKBB_colgraph_filth2_sig_samedirection.tiff', height=6, width=8)
 
 # assessing gene-trait pairs found by only one method
 mashr_pairs <- joint_df %>% filter(model=='MASHR') %>% select(gene, phenotype) %>% unique()
 matrixeqtl_pairs <- joint_df %>% filter(model=='MatrixeQTL') %>% select(gene, phenotype) %>% unique()
 en_pairs <- joint_df %>% filter(model=='EN', population!='ALL') %>% select(gene, phenotype) %>% unique()
+jti_pairs <- joint_df %>% filter(model=='JTI') %>% select(gene, phenotype) %>% unique()
+tigar_pairs <- joint_df %>% filter(model=='TIGAR') %>% select(gene, phenotype) %>% unique()
 
-unique_mashr <- anti_join(mashr_pairs, matrixeqtl_pairs) %>% anti_join(en_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MASHR')
-unique_matrixeqtl <- anti_join(matrixeqtl_pairs, mashr_pairs) %>% anti_join(en_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MatrixeQTL')
-unique_en <- anti_join(en_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='EN')
+unique_mashr <- anti_join(mashr_pairs, matrixeqtl_pairs) %>% anti_join(en_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MASHR')
+unique_matrixeqtl <- anti_join(matrixeqtl_pairs, mashr_pairs) %>% anti_join(en_pairs) %>% 
+  anti_join(jti_pairs) %>%  anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MatrixeQTL')
+unique_en <- anti_join(en_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='EN')
+unique_jti <- anti_join(jti_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(en_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='JTI')
+unique_tigar <- anti_join(tigar_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(en_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='TIGAR')
 
-joint_df_of_uniques <- rbind(unique_en, unique_mashr, unique_matrixeqtl)
+joint_df_of_uniques <- rbind(unique_en, unique_mashr, unique_matrixeqtl, unique_jti, unique_tigar)
 unq_col <- ggplot(joint_df_of_uniques, aes(x=model, y=n_gene_pairs, fill=model)) + geom_col(position='dodge') +
   scale_fill_viridis_d() + xlab('MESA population') + ylab('Number of unique gene-trait pairs') + labs(fill='Model')
 
@@ -184,19 +166,27 @@ total_col <- ggplot(n_pairs_per_pop, aes(x=population, y=n_pairs, fill=model)) +
   scale_fill_viridis_d() + xlab('MESA population') + ylab('Number of gene-trait pairs') + labs(fill='Model')
 
 ggarrange(total_col, unq_col, ncol=1, legend='right', common.legend=T)
-ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.pdf', height=6, width=8)
-ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.png', height=6, width=8)
-ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.tiff', height=6, width=8)
+#ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.pdf', height=6, width=8)
+#ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.png', height=6, width=8)
+#ggsave('PAGE_PanUKBB_n_sig_pairs_colgraph.tiff', height=6, width=8)
 
 ## adding unique/non-unique info to dataframe
-unique_mashr <- anti_join(mashr_pairs, matrixeqtl_pairs) %>% anti_join(en_pairs) %>% mutate(model='MASHR', unique='Y')
-unique_matrixeqtl <- anti_join(matrixeqtl_pairs, mashr_pairs) %>% anti_join(en_pairs) %>% mutate(model='MatrixeQTL', unique='Y')
-unique_en <- anti_join(en_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% mutate(model='EN', unique='Y')
-updated_joint_df <- rbind(unique_en, unique_mashr, unique_matrixeqtl) %>% full_join(joint_df) %>% 
+unique_mashr <- anti_join(mashr_pairs, matrixeqtl_pairs) %>% anti_join(en_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MASHR', unique='Y')
+unique_matrixeqtl <- anti_join(matrixeqtl_pairs, mashr_pairs) %>% anti_join(en_pairs) %>% 
+  anti_join(jti_pairs) %>%  anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='MatrixeQTL', unique='Y')
+unique_en <- anti_join(en_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='EN', unique='Y')
+unique_jti <- anti_join(jti_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(en_pairs) %>% anti_join(tigar_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='JTI', unique='Y')
+unique_tigar <- anti_join(tigar_pairs, matrixeqtl_pairs) %>% anti_join(mashr_pairs) %>% 
+  anti_join(jti_pairs) %>% anti_join(en_pairs) %>% summarise(n_gene_pairs=n()) %>% mutate(model='TIGAR', unique='Y')
+
+updated_joint_df <- rbind(unique_en, unique_mashr, unique_matrixeqtl, unique_jti, unique_tigar) %>% full_join(joint_df) %>% 
   select(gene, gene_name, tissue, population, model, phenotype, page_zscore, page_pvalue, page_effectsize, panukbb_zscore, panukbb_pvalue, panukbb_effectsize, unique) %>%
   arrange(tissue, population, model, phenotype)
 updated_joint_df$unique <- if_else(is.na(updated_joint_df$unique), 'N', 'Y')
-fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt.txt', col.names=T, quote=F, sep='\t')
+#fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt.txt', col.names=T, quote=F, sep='\t')
 
 ## adding GWAS Catalog studies to dataframe
 gwas_catalog <- fread('../alternative.gz') %>% clean_names() %>% select(disease_trait, mapped_trait, reported_gene_s, mapped_gene, study_accession)
@@ -237,12 +227,14 @@ for (i in c(1:nrow(genes_in_spredxican))){
     gwas_subset <- gwas_subset %>% filter(grepl('triglyceride measurement', mapped_trait)) %>% select(study_accession) %>% unique()
   } else if (genes_in_spredxican$phenotype[i]=='Mean_corpuscular_hemoglobin'){
     gwas_subset <- gwas_subset %>% filter(grepl('mean corpuscular hemoglobin', mapped_trait)) %>% select(study_accession) %>% unique()
+  } else if (genes_in_spredxican$phenotype[i]=='QRS_duration'){
+    gwas_subset <- gwas_subset %>% filter(grepl('QRS duration', mapped_trait)) %>% select(study_accession) %>% unique()
   } 
   
   if (nrow(gwas_subset)>0){
     gwas_subset <- gwas_subset$study_accession %>% t() %>% as.data.frame() 
     gwas_subset <- gwas_subset %>% unite('GWAS_catalog', c(colnames(gwas_subset)), sep=', ')
-
+    
     small_updated_joint_df <- updated_joint_df %>% filter(gene_name==genes_in_spredxican$gene_name[i], phenotype==genes_in_spredxican$phenotype[i])
     small_updated_joint_df <- small_updated_joint_df %>% mutate(GWAS_catalog=gwas_subset) %>% as.data.table()
     
@@ -254,35 +246,39 @@ for (i in c(1:nrow(genes_in_spredxican))){
 
 updated_joint_df <- left_join(updated_joint_df, compiled_joint_df_wGWAScatalogstudies) %>% filter(population!='ALL')
 updated_joint_df$GWAS_catalog <- updated_joint_df$GWAS_catalog %>% replace_na('none')
-fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt_wGWASCatalog.txt', col.names=T, quote=F, sep='\t')
-fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt_wGWASCatalog.csv', col.names=T, quote=F, sep=',')
+#fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt_wGWASCatalog.txt', col.names=T, quote=F, sep='\t')
+#fwrite(updated_joint_df, 'PAGE_PanUKBB_significant_results_updt_wGWASCatalog.csv', col.names=T, quote=F, sep=',')
 
 novel_assocs <- updated_joint_df %>% filter(GWAS_catalog=='none')
 sum_novel_assocs <- novel_assocs %>% select(gene_name, population, model, phenotype) %>% unique() %>% group_by(population, model) %>% summarise(novel_associations=n())
 ggplot(sum_novel_assocs, aes(x=population, y=novel_associations, fill=model)) + geom_col(position='dodge') + 
   scale_fill_viridis_d(name='Model') + xlab('Populations') + ylab('Number of possible novel genes-trait pairs')
-ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.png', height=4, width=6)
-ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.pdf', height=4, width=6)
-ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.tiff', height=4, width=6)
+#ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.png', height=4, width=6)
+#ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.pdf', height=4, width=6)
+#ggsave('PAGE_PanUKBB_new_assocs_per_model_colgraph.tiff', height=4, width=6)
 
 reported_assocs <- updated_joint_df %>% filter(GWAS_catalog!='none') %>% select(gene_name, phenotype) %>% unique()
 reported_assocs_permodel <- updated_joint_df %>% filter(GWAS_catalog!='none') %>% select(gene_name, population, model, phenotype) %>% 
   unique() %>% group_by(population, model) %>% summarise(n_pairs=n())
 ggplot(reported_assocs_permodel, aes(x=population, y=n_pairs, fill=model)) + geom_col(position='dodge') + 
   scale_fill_viridis_d(name='Model') + xlab('Populations') + ylab('Number of known GWAS catalog associations')
-ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.png', height=4, width=6)
-ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.pdf', height=4, width=6)
-ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.tiff', height=4, width=6)
+#ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.png', height=4, width=6)
+#ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.pdf', height=4, width=6)
+#ggsave('PAGE_PanUKBB_known_assocs_per_model_colgraph.tiff', height=4, width=6)
 
 # upset plot
 pop_traits <- updated_joint_df %>% select(gene, phenotype) %>% unique()
 mashr_pop_upset_df <- data.frame(MASHR_AFA=as.numeric(), MASHR_EUR=as.numeric(), MASHR_CHN=as.numeric(), MASHR_HIS=as.numeric())
 matrixeqtl_pop_upset_df <- data.frame(MatrixeQTL_AFA=as.numeric(), MatrixeQTL_EUR=as.numeric(), MatrixeQTL_CHN=as.numeric(), MatrixeQTL_HIS=as.numeric())
 en_pop_upset_df <- data.frame(EN_AFA=as.numeric(), EN_EUR=as.numeric(), EN_CHN=as.numeric(), EN_HIS=as.numeric())
+tigar_pop_upset_df <- data.frame(TIGAR_AFA=as.numeric(), TIGAR_EUR=as.numeric(), TIGAR_CHN=as.numeric(), TIGAR_HIS=as.numeric())
+jti_pop_upset_df <- data.frame(JTI_AFA=as.numeric(), JTI_EUR=as.numeric(), JTI_CHN=as.numeric(), JTI_HIS=as.numeric())
 for (i in 1:nrow(pop_traits)){
   mashr_tmp_df <- data.frame(MASHR_AFA=0, MASHR_EUR=0, MASHR_CHN=0, MASHR_HIS=0)
   matrixeqtl_tmp_df <- data.frame(MatrixeQTL_AFA=0, MatrixeQTL_EUR=0, MatrixeQTL_CHN=0, MatrixeQTL_HIS=0)
   en_tmp_df <- data.frame(EN_AFA=0, EN_EUR=0, EN_CHN=0, EN_HIS=0)
+  tigar_tmp_df <- data.frame(TIGAR_AFA=0, TIGAR_EUR=0, TIGAR_CHN=0, TIGAR_HIS=0)
+  jti_tmp_df <- data.frame(JTI_AFA=0, JTI_EUR=0, JTI_CHN=0, JTI_HIS=0)
   
   subset_joint_df <- updated_joint_df %>% filter(gene==pop_traits$gene[i], phenotype==pop_traits$phenotype[i])
   
@@ -325,6 +321,32 @@ for (i in 1:nrow(pop_traits)){
     en_his <- 1 
   } else { en_his <- 0}
   
+  if (nrow(filter(subset_joint_df, model=='TIGAR', population=='AFA'))>0){ 
+    tigar_afa <- 1 
+  } else { tigar_afa <- 0}
+  if (nrow(filter(subset_joint_df, model=='TIGAR', population=='EUR'))>0){ 
+    tigar_eur <- 1 
+  } else { tigar_eur <- 0}
+  if (nrow(filter(subset_joint_df, model=='TIGAR', population=='CHN'))>0){ 
+    tigar_chn <- 1 
+  } else { tigar_chn <- 0}
+  if (nrow(filter(subset_joint_df, model=='TIGAR', population=='HIS'))>0){ 
+    tigar_his <- 1 
+  } else { tigar_his <- 0}
+  
+  if (nrow(filter(subset_joint_df, model=='JTI', population=='AFA'))>0){ 
+    jti_afa <- 1 
+  } else { jti_afa <- 0}
+  if (nrow(filter(subset_joint_df, model=='JTI', population=='EUR'))>0){ 
+    jti_eur <- 1 
+  } else { jti_eur <- 0}
+  if (nrow(filter(subset_joint_df, model=='JTI', population=='CHN'))>0){ 
+    jti_chn <- 1 
+  } else { jti_chn <- 0}
+  if (nrow(filter(subset_joint_df, model=='JTI', population=='HIS'))>0){ 
+    jti_his <- 1 
+  } else { jti_his <- 0}
+  
   mashr_tmp_df[1,1] <- mashr_afa
   mashr_tmp_df[1,2] <- mashr_eur
   mashr_tmp_df[1,3] <- mashr_chn
@@ -340,27 +362,47 @@ for (i in 1:nrow(pop_traits)){
   en_tmp_df[1,3] <- en_chn
   en_tmp_df[1,4] <- en_his
   
+  tigar_tmp_df[1,1] <- tigar_afa
+  tigar_tmp_df[1,2] <- tigar_eur
+  tigar_tmp_df[1,3] <- tigar_chn
+  tigar_tmp_df[1,4] <- tigar_his
+  
+  jti_tmp_df[1,1] <- jti_afa
+  jti_tmp_df[1,2] <- jti_eur
+  jti_tmp_df[1,3] <- jti_chn
+  jti_tmp_df[1,4] <- jti_his
+  
   mashr_pop_upset_df <- rbind(mashr_pop_upset_df, mashr_tmp_df)
   matrixeqtl_pop_upset_df <- rbind(matrixeqtl_pop_upset_df, matrixeqtl_tmp_df)
   en_pop_upset_df <- rbind(en_pop_upset_df, en_tmp_df)
+  jti_pop_upset_df <- rbind(jti_pop_upset_df, jti_tmp_df)
+  tigar_pop_upset_df <- rbind(tigar_pop_upset_df, tigar_tmp_df)
   
 }
-pdf('mashr_pop_upset_plot.pdf', width=8, height=6.5)
-mashr_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('MASHR_AFA','MASHR_EUR','MASHR_HIS','MASHR_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
-png('mashr_pop_upset_plot.png', width=8, height=6.5, units='in', res=300)
-mashr_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('MASHR_AFA','MASHR_EUR','MASHR_HIS','MASHR_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
-tiff('mashr_pop_upset_plot.tiff', width=8, height=6.5, units='in', res=300)
-mashr_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('MASHR_AFA','MASHR_EUR','MASHR_HIS','MASHR_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
 
-pdf('en_pop_upset_plot.pdf', width=8, height=6.5)
-en_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('EN_AFA','EN_EUR','EN_HIS','EN_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
-png('en_pop_upset_plot.png', width=8, height=6.5, units='in', res=300)
-en_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('EN_AFA','EN_EUR','EN_HIS','EN_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
-tiff('en_pop_upset_plot.tiff', width=8, height=6.5, units='in', res=300)
-en_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('EN_AFA','EN_EUR','EN_HIS','EN_CHN'), empty.intersections='on', mainbar.y.max=20)
-dev.off() 
+jti_pop_upset_df <- jti_pop_upset_df %>% mutate(method='JTI') 
+colnames(jti_pop_upset_df) <- gsub('JTI_', '', colnames(jti_pop_upset_df))
+tigar_pop_upset_df <- tigar_pop_upset_df %>% mutate(method='TIGAR') 
+colnames(tigar_pop_upset_df) <- gsub('TIGAR_', '', colnames(tigar_pop_upset_df))
+en_pop_upset_df <- en_pop_upset_df %>% mutate(method='EN') 
+colnames(en_pop_upset_df) <- gsub('EN_', '', colnames(en_pop_upset_df))
+mashr_pop_upset_df <- mashr_pop_upset_df %>% mutate(method='MASHR') 
+colnames(mashr_pop_upset_df) <- gsub('MASHR_', '', colnames(mashr_pop_upset_df))
+matrixeqtl_pop_upset_df <- matrixeqtl_pop_upset_df %>% mutate(method='MatrixeQTL') 
+colnames(matrixeqtl_pop_upset_df) <- gsub('MatrixeQTL_', '', colnames(matrixeqtl_pop_upset_df))
+
+jti_upset <- jti_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), empty.intersections='on', mainbar.y.max=20) %>% as.ggplot()
+en_upset <- en_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), empty.intersections='on', mainbar.y.max=20) %>% as.ggplot()
+tigar_upset <- tigar_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), empty.intersections='on', mainbar.y.max=20) %>% as.ggplot()
+mashr_upset <- mashr_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), empty.intersections='on', mainbar.y.max=20) %>% as.ggplot()
+matrixeqtl_upset <- matrixeqtl_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), empty.intersections='on', mainbar.y.max=20) %>% as.ggplot()
+ggarrange(en_upset, jti_upset, mashr_upset, matrixeqtl_upset, tigar_upset, nrow=1)
+ggsave('all_methods_upset.pdf', height=6, width=40)
+
+jti_upset <- jti_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), mainbar.y.max=20) %>% as.ggplot()
+en_upset <- en_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), mainbar.y.max=20) %>% as.ggplot()
+tigar_upset <- tigar_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), mainbar.y.max=20) %>% as.ggplot()
+mashr_upset <- mashr_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), mainbar.y.max=20) %>% as.ggplot()
+matrixeqtl_upset <- matrixeqtl_pop_upset_df %>% upset(point.size=5.5, line.size=3, text.scale=3, nintersects=NA, keep.order=T, sets=c('AFA','EUR','HIS','CHN'), mainbar.y.max=20) %>% as.ggplot()
+ggarrange(en_upset, jti_upset, mashr_upset, matrixeqtl_upset, tigar_upset, nrow=1)
+ggsave('all_methods_upset_nonull.pdf', height=6, width=40)

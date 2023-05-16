@@ -1,8 +1,5 @@
 library(data.table)
 library(tidyverse)
-library(UpSetR)
-library(viridis)
-library(ggpubr)
 library(janitor)
 '%&%' = function(a,b) paste (a,b,sep='')
 setwd('/home/daniel/SPrediXcan/WGS_SPredixcan')
@@ -14,25 +11,13 @@ for (tis in c('PBMC','Mono','Tcell')){
     if (tis!='PBMC' & pop=='CHN'){
       next
     } else {
-      if (pop=='ALL'){
-        for (m in c('elasticnet_unfiltered')){
-          for (pheno in page_phenos){
-            spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            
-            if (exists('compiled_page_spredixcan')){
-              compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
-            } else {compiled_page_spredixcan <- spredixcan_output}
-          }
-        }
-      } else {
-        for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered')){
-          for (pheno in page_phenos){
-            spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            
-            if (exists('compiled_page_spredixcan')){
-              compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
-            } else {compiled_page_spredixcan <- spredixcan_output}
-          }
+      for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered', 'TIGAR', 'JTI')){
+        for (pheno in page_phenos){
+          spredixcan_output <- fread('PAGE/WojcikG_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
+          
+          if (exists('compiled_page_spredixcan')){
+            compiled_page_spredixcan <- rbind(compiled_page_spredixcan, spredixcan_output)
+          } else {compiled_page_spredixcan <- spredixcan_output}
         }
       }
     }
@@ -46,33 +31,17 @@ for (tis in c('PBMC','Mono','Tcell')){
     if (tis!='PBMC' & pop=='CHN'){
       next
     } else {
-      if (pop=='ALL'){
-        for (m in c('elasticnet_unfiltered')){
-          for (pheno in panukbb_phenos){
-            if (pheno=='WBCHQ'){
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            } else{
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            }
-            
-            if (exists('compiled_panukbb_spredixcan')){
-              compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
-            } else {compiled_panukbb_spredixcan <- spredixcan_output}
+      for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered', 'TIGAR', 'JTI')){
+        for (pheno in panukbb_phenos){
+          if (pheno=='WBCHQ'){
+            spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
+          } else{
+            spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
           }
-        }
-      } else {
-        for (m in c('mashr','matrixeQTL', 'elasticnet_unfiltered')){
-          for (pheno in panukbb_phenos){
-            if (pheno=='WBCHQ'){
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_hq_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            } else{
-              spredixcan_output <- fread('PanUKBB/Pan.UK.Biobank_meta_'%&% m %&%'_'%&% pheno %&%'_'%&% tis %&%'_'%&% pop %&%'.csv') %>% mutate(tissue=tis, population=pop, model=m, phenotype=pheno) 
-            }
-            
-            if (exists('compiled_panukbb_spredixcan')){
-              compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
-            } else {compiled_panukbb_spredixcan <- spredixcan_output}
-          }
+          
+          if (exists('compiled_panukbb_spredixcan')){
+            compiled_panukbb_spredixcan <- rbind(compiled_panukbb_spredixcan, spredixcan_output)
+          } else {compiled_panukbb_spredixcan <- spredixcan_output}
         }
       }
     }
