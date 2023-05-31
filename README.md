@@ -41,7 +41,7 @@ ___
 
 ### Step 0. Clone the repo and move into it
 
-Before atempting to run our pipeline, you should clone the repo and then move into it.
+Before attempting to run our pipeline, you should clone the repo and then move into it.
 
 `git clone https://github.com/danielsarj/TOPMed_MESA_crosspop_portability.git`
 
