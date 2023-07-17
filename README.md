@@ -4,7 +4,7 @@ Most of the transcriptome prediction models are built using European-descent ind
 
 To build our transcriptome prediction models, we used data from the [TOPMed Multi-Ethnic Study of Atherosclerosis](https://doi.org/10.1093/aje/kwf113). Our models are designed to work with the [MetaXcan](https://github.com/hakyimlab/MetaXcan) family of TWAS tools and are freely available for anyone to use. They can be found in our [Zenodo](https://doi.org/10.5281/zenodo.7551845) repository. 
 
-For more information about model design and performance, please refer to the research article "_Multivariate adaptive shrinkage improves cross-population transcriptome prediction for transcriptome-wide association studies in underrepresented populations_" by Daniel S. Araujo _et al_. [bioRxiv](https://doi.org/10.1101/2023.02.09.527747)
+For more information about model design and performance, please refer to the research article "_Multivariate adaptive shrinkage improves cross-population transcriptome prediction and association studies in underrepresented populations_" by Daniel S. Araujo _et al_. [HGG Advances (2023)](https://doi.org/10.1016/j.xhgg.2023.100216)
 
 ## Table of Contents
 
